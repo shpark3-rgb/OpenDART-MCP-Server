@@ -21,7 +21,8 @@ async function handler(req: Request) {
   // 팀 비밀번호: Vercel 환경변수 FOOTING_TOKEN이 설정돼 있으면 ?token= 값이 같아야만 허용
   const required = process.env.FOOTING_TOKEN;
   if (required && url.searchParams.get("token") !== required) {
-    return new Response("Unauthorized (token required)", { status: 401 });
+    // 401을 돌려주면 Claude가 OAuth 로그인 절차를 시도하다 실패하므로 403으로 거절한다
+    return new Response("Forbidden (team token required: add ?token=... to the connector URL)", { status: 403 });
   }
   const apiKey = url.searchParams.get("opendart_key");
   return runWithRequestApiKey(apiKey, () => mcpHandler(req));
